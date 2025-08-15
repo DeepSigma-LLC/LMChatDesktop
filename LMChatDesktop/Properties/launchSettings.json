@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LMChatDesktop (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LMChatDesktop (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
