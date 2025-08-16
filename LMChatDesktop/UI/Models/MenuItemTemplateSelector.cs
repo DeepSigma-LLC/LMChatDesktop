@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LMChatDesktop.UI
+namespace LMChatDesktop.UI.Models
 {
 
     [ContentProperty(Name = "ItemTemplate")]

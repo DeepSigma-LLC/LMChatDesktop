@@ -1,4 +1,4 @@
-using LMChatDesktop.UI;
+using LMChatDesktop.UI.Models;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -35,10 +35,10 @@ namespace LMChatDesktop
     /// </summary>
     public sealed partial class ChatPage : Page, INotifyPropertyChanged
     {
-        private ObservableCollection<ItemViewModel<string>> Models = [];
-        private ObservableCollection<ItemViewModel<string>> ModelProviders = [];
-        private ObservableCollection<Message> Messages = [];
-
+        private LMModelConfig _modelConfig = ModelConstructor.GetConfig();
+        private ObservableCollection<ItemViewModel<string>> Models { get; set; } = [];
+        private ObservableCollection<ItemViewModel<string>> ModelProviders { get; set; } = [];
+        private MessageHistory MessageHistory { get; set; } = new();
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string? name = null)
@@ -57,30 +57,32 @@ namespace LMChatDesktop
         public ItemViewModel<string>? SelectedModelProviderItem
         {
             get => _selectedModelProviderItem;
-            set { _selectedModelProviderItem = value; OnPropertyChanged(); RebuildModelProviderSplitFlyout(); }
+            set { _selectedModelProviderItem = value; LoadModels();  OnPropertyChanged(); RebuildModelProviderSplitFlyout(); RebuildModelSplitFlyout(); if (Models.Count > 0) SelectedModelItem = Models[0]; }
         }
         public ChatPage()
         {
             InitializeComponent();
             LoadProviderSources();
             RebuildModelProviderSplitFlyout();
-            LoadModels();
+            if (ModelProviders.Count > 0) SelectedModelProviderItem = ModelProviders[0];
             if (Models.Count > 0) SelectedModelItem = Models[0];
-            if (Models.Count > 0) SelectedModelProviderItem = ModelProviders[0];
 
             Models.CollectionChanged += Models_CollectionChanged; // Keep flyout in sync if the list changes dynamically
         }
 
+        private void Models_CollectionChanged(object? s, NotifyCollectionChangedEventArgs e) => RebuildModelSplitFlyout();
+
+
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            Messages.Add(new Message
+            MessageHistory.Messages.Add(new Message
             {
                 MsgText = MessageInput.Text.Trim(),
                 MsgDateTime = DateTime.Now,
                 IsMyMessage = true
             });
 
-            Messages.Add(new Message
+            MessageHistory.Messages.Add(new Message
             {
                 MsgText = "This is an example of a system generated message!",
                 MsgDateTime = DateTime.Now,
@@ -95,19 +97,39 @@ namespace LMChatDesktop
             InvertedListView.Items.Clear();
         }
 
+        private void Configure_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ConfigurePopup.IsOpen)
+            { 
+                ConfigurePopup.IsOpen = true;  
+                return; 
+            }
+            ConfigurePopup.IsOpen = false; 
+        }
+
         private void LoadModels()
         {
-            Models.Add(new("GPT-4o"));
-            Models.Add(new("GPT-4.1"));
-            Models.Add(new("GPT-5"));
+            Models.Clear();
+            string? selected_provider_name = SelectedModelProviderItem?.Label;
+            if (string.IsNullOrWhiteSpace(selected_provider_name)) { return; }
+
+            LMModelProvider? selectedProvider = _modelConfig.GetModelProviderByName(selected_provider_name);
+            if (selectedProvider is null){ return;}
+
+            List<LMModel> models = selectedProvider.Models;
+            foreach (LMModel model in models)
+            {
+                Models.Add(new ItemViewModel<string>(model.ModelName, model.FriendelyModelName, model.Description ?? string.Empty));
+            }
         }
 
         private void LoadProviderSources()
         {
-            ModelProviders.Add(new("OpenAI API"));
-            ModelProviders.Add(new("Anthropic"));
-            ModelProviders.Add(new("Azure"));
-            ModelProviders.Add(new("Ollama"));
+            ModelProviders.Clear();
+            foreach (LMModelProvider provider in _modelConfig.GetEnabledModelProviders())
+            {
+                ModelProviders.Add(new ItemViewModel<string>(provider.Name, provider.Name));
+            }
         }
 
         private void RebuildModelSplitFlyout()
@@ -122,6 +144,11 @@ namespace LMChatDesktop
                 {
                     SelectedModelItem = (ItemViewModel<string>)((MenuFlyoutItem)sender!).Tag!;
                 };
+
+                if(string.IsNullOrWhiteSpace(m.ToolTipLabel) ==false)
+                {
+                    ToolTipService.SetToolTip(item, m.ToolTipLabel);
+                }
                 menu.Items.Add(item);
             }
             mymodels.Flyout = menu;
@@ -156,8 +183,6 @@ namespace LMChatDesktop
             }
         }
 
-        private void Models_CollectionChanged(object? s, NotifyCollectionChangedEventArgs e) => RebuildModelSplitFlyout();
-
         private void ShowCopiedToast(string message)
         {
             CopyInfoBar.Message = message;
@@ -180,5 +205,6 @@ namespace LMChatDesktop
                 { e.Handled = true; SendButton_Click(s, e); }
             }
         }
+
     }
 }

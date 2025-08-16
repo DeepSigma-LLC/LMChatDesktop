@@ -1,4 +1,4 @@
-using LMChatDesktop.UI;
+using LMChatDesktop.UI.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -26,10 +26,11 @@ namespace LMChatDesktop
     public sealed partial class MainWindow : Window
     {
         private ObservableCollection<Category> Categories { get; set; } = [];
+        private ObservableCollection<ItemViewModel<MessageHistory>> ChatHistories { get; set; } = [];
         public MainWindow()
         {
             InitializeComponent();
-            Loaded();
+            LoadChatHistory();
             contentFrame.Navigate(typeof(ChatPage));
         }
 
@@ -38,12 +39,16 @@ namespace LMChatDesktop
 
         }
 
-        private void Loaded()
+        private void LoadChatHistory()
         {
-            Categories.Add(new Category { Name = "Home", Glyph = Symbol.Home, Tooltip = "This is category 1" });
-            Categories.Add(new Category { Name = "Chat 1", Glyph = Symbol.Message, Tooltip = "This is category 2" });
-            Categories.Add(new Category { Name = "Chat 2", Glyph = Symbol.Message, Tooltip = "This is category 3" });
-            Categories.Add(new Category { Name = "Chat 3", Glyph = Symbol.Message, Tooltip = "This is category 4" });
+            ChatHistories.Add(new(new MessageHistory(), "New Chat", "Create a new chat", Symbol.Add));
+            ChatHistories.Add(new(new MessageHistory(), "Chat 1", "Chat Number 1", Symbol.Message));
+            ChatHistories.Add(new(new MessageHistory(), "Chat 2", "Chat Number 2", Symbol.Message));
+
+            foreach(ItemViewModel<MessageHistory> chat in ChatHistories)
+            {
+                Categories.Add(new Category { Name = chat.Label, Glyph = chat.SymbolIcon ?? Symbol.Placeholder, Tooltip = chat.ToolTipLabel ?? string.Empty});
+            }
         }
 
     }

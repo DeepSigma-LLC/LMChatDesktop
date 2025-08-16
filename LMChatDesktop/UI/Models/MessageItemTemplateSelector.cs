@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LMChatDesktop.UI
+namespace LMChatDesktop.UI.Models
 {
     public class MessageItemTemplateSelector : DataTemplateSelector
     {
@@ -15,7 +15,7 @@ namespace LMChatDesktop.UI
         protected override DataTemplate? SelectTemplateCore(object item, DependencyObject container)
         {
             var msg = item as Message;
-            return (msg?.IsMyMessage == true) ? RightTemplate! : LeftTemplate!;
+            return msg?.IsMyMessage == true ? RightTemplate! : LeftTemplate!;
         }
     }
 }
