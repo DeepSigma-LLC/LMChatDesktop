@@ -1,4 +1,5 @@
 using LMChatDesktop.UI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -21,6 +22,8 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
+using Windows.UI.Core;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -166,6 +169,16 @@ namespace LMChatDesktop
             {
                 DispatcherQueue.TryEnqueue(() => CopyInfoBar.IsOpen = false);
             });
+        }
+
+        private void MessageInput_KeyUp(object s, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                var shift = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
+                if ((shift & CoreVirtualKeyStates.Down) != CoreVirtualKeyStates.Down)
+                { e.Handled = true; SendButton_Click(s, e); }
+            }
         }
     }
 }

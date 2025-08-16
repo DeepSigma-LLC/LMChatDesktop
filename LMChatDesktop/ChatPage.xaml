@@ -39,7 +39,10 @@ sent or received, and those values are bound in the DataTemplate.-->
                         <RatingControl AutomationProperties.Name="Simple RatingControl" IsClearEnabled="False" IsReadOnly="False" Caption="Evaluation"/>
                         <TextBlock Padding="10"/>
                         <CheckBox Content="Include in Chat History" IsChecked="True"/>
-                        <AppBarButton Icon="Copy" Label="Copy" Click="CopyButton_Click"/>
+                        <TextBlock Padding="10"/>
+                        <Button  Click="CopyButton_Click" ToolTipService.ToolTip="Copy">
+                            <SymbolIcon Symbol="Copy"/>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -88,26 +91,6 @@ sent or received, and those values are bound in the DataTemplate.-->
         </Grid>
         
 
-        <!-- Chat list 
-        <ListView x:Name="InvertedListView"
-              Grid.Row="1"
-              ItemTemplate="{StaticResource MessageTemplate}"
-              ScrollViewer.VerticalScrollMode="Auto"
-              ScrollViewer.VerticalScrollBarVisibility="Auto">
-
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" VerticalAlignment="Bottom"/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>-->
-
         <ListView  x:Name="InvertedListView" Grid.Row="1" ItemsSource="{x:Bind Messages}"
             ItemTemplateSelector="{StaticResource MessageSelector}" ScrollViewer.VerticalScrollMode="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto">
 
@@ -130,9 +113,16 @@ sent or received, and those values are bound in the DataTemplate.-->
             <Button Grid.Column="0" Click="ClearButton_Click" ToolTipService.ToolTip="Add Content">
                 <SymbolIcon Symbol="Add"/>
             </Button>
-            <TextBox x:Name="MessageInput" Grid.Column="1" TextWrapping="Wrap" PlaceholderText="Type your message here..." MaxHeight="160"/>
-            <Button Grid.Column="2" Content="Send" Click="SendButton_Click" Style="{StaticResource AccentButtonStyle}"/>
-           
+            <TextBox x:Name="MessageInput" Grid.Column="1" TextWrapping="Wrap" PlaceholderText="Type your message here..." MaxHeight="160"
+                     AcceptsReturn="True" KeyUp="MessageInput_KeyUp" >
+                <!--TextBox.KeyboardAccelerators>
+                    Fires when Enter is pressed while the TextBox has focus 
+                    <KeyboardAccelerator Key="Enter" Invoked="EnterAccelerator_Invoked"/>
+                </TextBox.KeyboardAccelerators-->
+            </TextBox>
+            <Button Grid.Column="2" Click="SendButton_Click" Style="{StaticResource AccentButtonStyle}">
+                <SymbolIcon Symbol="Send"/>
+            </Button>
         </Grid>
 
         <InfoBar x:Name="CopyInfoBar"
