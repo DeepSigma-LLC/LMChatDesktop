@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using LMChatDesktop.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -10,6 +6,12 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -23,9 +25,11 @@ namespace LMChatDesktop
     /// </summary>
     public sealed partial class MainWindow : Window
     {
+        private ObservableCollection<Category> Categories { get; set; } = [];
         public MainWindow()
         {
             InitializeComponent();
+            Loaded();
             contentFrame.Navigate(typeof(ChatPage));
         }
 
@@ -33,5 +37,14 @@ namespace LMChatDesktop
         {
 
         }
+
+        private void Loaded()
+        {
+            Categories.Add(new Category { Name = "Home", Glyph = Symbol.Home, Tooltip = "This is category 1" });
+            Categories.Add(new Category { Name = "Chat 1", Glyph = Symbol.Message, Tooltip = "This is category 2" });
+            Categories.Add(new Category { Name = "Chat 2", Glyph = Symbol.Message, Tooltip = "This is category 3" });
+            Categories.Add(new Category { Name = "Chat 3", Glyph = Symbol.Message, Tooltip = "This is category 4" });
+        }
+
     }
 }

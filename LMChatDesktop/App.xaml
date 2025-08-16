@@ -3,14 +3,32 @@
     x:Class="LMChatDesktop.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:LMChatDesktop">
+    xmlns:local="using:LMChatDesktop"
+    xmlns:models="using:LMChatDesktop.UI"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls">
+    
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                <controls:XamlControlsResources />
                 <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
+ 
+
+        <models:MenuItemTemplateSelector x:Key="selector">
+            <models:MenuItemTemplateSelector.ItemTemplate>
+                <DataTemplate>
+                        <NavigationViewItem Content="{Binding Name}"
+                                ToolTipService.ToolTip="{Binding Tooltip}">
+                        <NavigationViewItem.Icon>
+                                <SymbolIcon Symbol="{Binding Glyph}"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </DataTemplate>
+            </models:MenuItemTemplateSelector.ItemTemplate>
+        </models:MenuItemTemplateSelector>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>
