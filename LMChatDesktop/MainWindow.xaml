@@ -27,7 +27,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Frame Grid.Row="0" x:Name="contentFrame" />
+                <Frame Grid.Row="0" x:Name="content_frame" />
                 <TextBlock Grid.Row="1" Text="Version 1.0.0.0" HorizontalAlignment="Center" Padding="0,0,0,10" Foreground="Gray"/>
             </Grid>
         </NavigationView>

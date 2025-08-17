@@ -7,5 +7,4 @@ using System.Threading.Tasks;
 namespace LMChatDesktop.UI.Models
 {
     public class Separator : CategoryBase { }
-
 }

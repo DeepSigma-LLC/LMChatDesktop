@@ -16,9 +16,9 @@ namespace LMChatDesktop
                 Name = "OpenAI",
                 Models = new List<LMModel>()
                 {
-                    new LMModel() { FriendelyModelName = "GPT-4o", ModelName = "gpt-4o", Description = "Great for quick anwsers and writting" },
-                    new LMModel() { FriendelyModelName = "GPT-4.1", ModelName = "gpt-4.1", Description = "Great for coding and visual" },
-                    new LMModel() { FriendelyModelName = "GPT-5", ModelName = "gpt-5", Description = "Intelligent routing" }
+                    new LMModel() { FriendelyModelName = "GPT-4o", ModelName = "gpt-4o", Description = "Great for quick anwsers and writting", WebSearchEnabled = true, DeepResearchEnabled = true },
+                    new LMModel() { FriendelyModelName = "GPT-4.1", ModelName = "gpt-4.1", Description = "Great for coding and visual", WebSearchEnabled = true, DeepResearchEnabled = true },
+                    new LMModel() { FriendelyModelName = "GPT-5", ModelName = "gpt-5", Description = "Intelligent routing", WebSearchEnabled = true }
                 }
             });
 

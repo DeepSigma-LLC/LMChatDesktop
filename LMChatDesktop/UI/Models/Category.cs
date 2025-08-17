@@ -11,11 +11,8 @@ namespace LMChatDesktop.UI.Models
     {
         public string Name { get; set; } = "Undefined";
         public string Tooltip { get; set; } = "No tooltip provided";
-        public Symbol Glyph { get; set; } = Symbol.Play;
-        public Category()
-        {
-            
-        }
+        public Symbol Glyph { get; set; } = Symbol.Placeholder;
+        public Category(){}
     }
 
 }

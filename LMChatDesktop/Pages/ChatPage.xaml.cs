@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
@@ -28,7 +27,7 @@ using Windows.UI.Core;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace LMChatDesktop
+namespace LMChatDesktop.Pages
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -36,8 +35,8 @@ namespace LMChatDesktop
     public sealed partial class ChatPage : Page, INotifyPropertyChanged
     {
         private LMModelConfig _modelConfig = ModelConstructor.GetConfig();
-        private ObservableCollection<ItemViewModel<string>> Models { get; set; } = [];
-        private ObservableCollection<ItemViewModel<string>> ModelProviders { get; set; } = [];
+        private ObservableCollection<ItemViewModel<LMModel>> Models { get; set; } = [];
+        private ObservableCollection<ItemViewModel<LMModelProvider>> ModelProviders { get; set; } = [];
         private MessageHistory MessageHistory { get; set; } = new();
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,21 +45,22 @@ namespace LMChatDesktop
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private ItemViewModel<string>? _selectedModelItem;
-        public ItemViewModel<string>? SelectedModelItem
+        private ItemViewModel<LMModel>? _selectedModelItem;
+        public ItemViewModel<LMModel>? SelectedModelItem
         {
             get => _selectedModelItem;
-            set { _selectedModelItem = value; OnPropertyChanged(); RebuildModelSplitFlyout(); }
+            set { _selectedModelItem = value; OnPropertyChanged(); RebuildModelSplitFlyout(); ResetModelConfigToggles(); }
         }
 
-        private ItemViewModel<string>? _selectedModelProviderItem;
-        public ItemViewModel<string>? SelectedModelProviderItem
+        private ItemViewModel<LMModelProvider>? _selectedModelProviderItem;
+        public ItemViewModel<LMModelProvider>? SelectedModelProviderItem
         {
             get => _selectedModelProviderItem;
             set { _selectedModelProviderItem = value; LoadModels();  OnPropertyChanged(); RebuildModelProviderSplitFlyout(); RebuildModelSplitFlyout(); if (Models.Count > 0) SelectedModelItem = Models[0]; }
         }
+
         public ChatPage()
-        {
+        {                
             InitializeComponent();
             LoadProviderSources();
             RebuildModelProviderSplitFlyout();
@@ -68,6 +68,49 @@ namespace LMChatDesktop
             if (Models.Count > 0) SelectedModelItem = Models[0];
 
             Models.CollectionChanged += Models_CollectionChanged; // Keep flyout in sync if the list changes dynamically
+        }
+
+        private void ResetModelConfigToggles()
+        {
+            if(SelectedModelItem is not null)
+            {
+                if(SelectedModelItem.ItemObject.DeepResearchEnabled)
+                {
+                   
+                    DeepResearchToggle.IsEnabled = true;
+                }
+                else
+                {
+                    DeepResearchToggle.IsOn = false;
+                    DeepResearchToggle.IsEnabled = false;
+                }
+
+                if (SelectedModelItem.ItemObject.WebSearchEnabled)
+                {
+
+                    WebSearchToggle.IsEnabled = true;
+                }
+                else
+                {
+                    WebSearchToggle.IsOn = false;
+                    WebSearchToggle.IsEnabled = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// This meth is invoked when the page is navigated to. It receives a parameter of type MessageHistory to load the chat history.
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (e.Parameter is MessageHistory history)
+            {
+                history.Messages ??= []; // Ensure the Messages collection is initialized
+                MessageHistory = history;
+            }
         }
 
         private void Models_CollectionChanged(object? s, NotifyCollectionChangedEventArgs e) => RebuildModelSplitFlyout();
@@ -119,7 +162,7 @@ namespace LMChatDesktop
             List<LMModel> models = selectedProvider.Models;
             foreach (LMModel model in models)
             {
-                Models.Add(new ItemViewModel<string>(model.ModelName, model.FriendelyModelName, model.Description ?? string.Empty));
+                Models.Add(new ItemViewModel<LMModel>(model, model.FriendelyModelName, model.Description ?? string.Empty));
             }
         }
 
@@ -128,7 +171,7 @@ namespace LMChatDesktop
             ModelProviders.Clear();
             foreach (LMModelProvider provider in _modelConfig.GetEnabledModelProviders())
             {
-                ModelProviders.Add(new ItemViewModel<string>(provider.Name, provider.Name));
+                ModelProviders.Add(new ItemViewModel<LMModelProvider>(provider, provider.Name));
             }
         }
 
@@ -142,7 +185,7 @@ namespace LMChatDesktop
                 var item = new MenuFlyoutItem { Text = m.Label, Tag = m };
                 item.Click += (sender, args) =>
                 {
-                    SelectedModelItem = (ItemViewModel<string>)((MenuFlyoutItem)sender!).Tag!;
+                    SelectedModelItem = (ItemViewModel<LMModel>)((MenuFlyoutItem)sender!).Tag!;
                 };
 
                 if(string.IsNullOrWhiteSpace(m.ToolTipLabel) ==false)
@@ -164,7 +207,7 @@ namespace LMChatDesktop
                 var item = new MenuFlyoutItem { Text = m.Label, Tag = m };
                 item.Click += (sender, args) =>
                 {
-                    SelectedModelProviderItem = (ItemViewModel<string>)((MenuFlyoutItem)sender!).Tag!;
+                    SelectedModelProviderItem = (ItemViewModel<LMModelProvider>)((MenuFlyoutItem)sender!).Tag!;
                 };
                 menu.Items.Add(item);
             }

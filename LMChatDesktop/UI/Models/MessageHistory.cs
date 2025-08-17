@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace LMChatDesktop.UI.Models
 {
-    internal class MessageHistory
+    public class MessageHistory
     {
-        internal ObservableCollection<Message> Messages = [];
-
+        public ObservableCollection<Message> Messages = [];
         public MessageHistory()
         {
             

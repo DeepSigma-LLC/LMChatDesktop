@@ -14,7 +14,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-
+using LMChatDesktop.Pages;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
@@ -31,12 +31,23 @@ namespace LMChatDesktop
         {
             InitializeComponent();
             LoadChatHistory();
-            contentFrame.Navigate(typeof(ChatPage));
         }
 
         public void NavigationView_SelectionChanged(object sender, NavigationViewSelectionChangedEventArgs e)
         {
-
+            if(e.IsSettingsSelected)
+            {
+                content_frame.Navigate(typeof(SettingsPage));
+            }
+            else if(e.SelectedItem is null) // TODO update to navigate to saved message histroy
+            {
+                content_frame.Navigate(typeof(ChatPage), new MessageHistory());
+            }
+            else
+            {
+                //New chat selected
+                content_frame.Navigate(typeof(ChatPage)); 
+            }
         }
 
         private void LoadChatHistory()
@@ -50,6 +61,5 @@ namespace LMChatDesktop
                 Categories.Add(new Category { Name = chat.Label, Glyph = chat.SymbolIcon ?? Symbol.Placeholder, Tooltip = chat.ToolTipLabel ?? string.Empty});
             }
         }
-
     }
 }
